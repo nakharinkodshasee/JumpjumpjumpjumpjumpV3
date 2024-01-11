@@ -1,31 +1,49 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class appear : MonoBehaviour
 {
-    /*[SerializeField] private Image customImage;*/
     public int isappear = 0;
     private SpriteRenderer spr;
-
-    // Start is called before the first frame update
+    public GameObject robot;
+    private movement moveScript;
+    public AudioClip winSound;
+    private AudioSource audioSource;
+    
     void Start()
     {
-        //gameObject.SetActive(false);
         spr = GetComponent<SpriteRenderer>();
         spr.enabled = false;
+
+        
+
+        moveScript = robot.GetComponent<movement>();
+        audioSource = GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        isappear = GameObject.Find("player").GetComponent<movement>().win;
-        Debug.Log(isappear);
-        Debug.Log("heloo");
+        isappear = moveScript.win;
         if ( isappear == 1)
         {
-            spr.enabled = true;
+            if (audioSource.clip == null)
+            {
+                audioSource.clip = winSound;
+                audioSource.Play();
+                spr.enabled = true;
+
+                StreamReader inp_stm = new StreamReader(Application.persistentDataPath + "/LevelState.txt");
+                int currentScene = int.Parse(SceneManager.GetActiveScene().name.Replace("lv", ""));
+                string inp_ln = inp_stm.ReadLine();
+                inp_ln = inp_ln.Replace("Lv"+(currentScene+1)+":l", "Lv" + (currentScene+1) + ":ul");
+                Debug.Log("Lv" + currentScene + ":ul");
+                inp_stm.Close();
+                File.WriteAllText(Application.persistentDataPath + "/LevelState.txt", inp_ln);
+            }
+            
         }
 
         if (isappear == 0)

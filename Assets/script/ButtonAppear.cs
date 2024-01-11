@@ -5,25 +5,32 @@ using UnityEngine.UI;
 
 public class ButtonAppear : MonoBehaviour
 {
-    private Button bt;
     private Image im;
-    private Text txt;
+    private Transform transform;
 
     void Start()
     {
-        bt = GetComponent<Button>();
         im = GetComponent<Image>();
-        txt = GetComponent<Text>();
+        transform = GetComponent<Transform>();
         im.enabled = false;
-        txt.enabled = false;
+        transform.position = new Vector2(transform.position.x + 1500, transform.position.y);
     }
 
-    
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             im.enabled = !im.enabled;
+            if(im.enabled == true)
+            {
+                transform.position = new Vector2(transform.position.x - 1500, transform.position.y);
+            }
+            else 
+            {
+                transform.position = new Vector2(transform.position.x + 1500, transform.position.y);
+            }
+            
+            
         }
     }
 }

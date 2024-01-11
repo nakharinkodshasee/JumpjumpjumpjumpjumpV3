@@ -8,37 +8,29 @@ public class PlayerJump : MonoBehaviour
     public float fallForce = 1;
     private Rigidbody2D rb;
     private int jumpCount = 1000;
-    // Start is called before the first frame update
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // Check if the space bar is being pressed
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            // If the character can jump
             fallForce = 1;
             if (jumpCount > 0)
             {
-                // Apply a force to the character's rigidbody in the upward direction
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-
-                // Decrement the jump count
                 jumpCount--;
             }
         }
 
-        // Check if the space bar is being held
         if (Input.GetKeyUp(KeyCode.Space))
         {
             while (fallForce < 10)
             {
                 rb.AddForce(Vector2.down * fallForce, ForceMode2D.Impulse);
-                Debug.Log("release");
                 fallForce = ((fallForce + 1) * Time.deltaTime) ;
             }
         }

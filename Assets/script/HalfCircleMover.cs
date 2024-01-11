@@ -9,12 +9,6 @@ public class HalfCircleMover : MonoBehaviour
     public Vector3 pivotPoint = Vector3.zero;
 
     private float totalRotation = 0.0f;
-   
-    void Start()
-    {
-        
-    }
-
     
     void Update()
     {

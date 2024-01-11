@@ -18,19 +18,31 @@ public class movement : MonoBehaviour
     public int win = 0;
     public int isflagged = 0;
     public float timeRemaining = 5;
-    // Start is called before the first frame update
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
+    public AudioClip dieSound;
+    private AudioSource audioSource;
+    private bool audioPlayed;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        other = GetComponent<BoxCollider2D>();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.clip = dieSound;
     }
 
-    // Update is called once per frame
     void Update()
     {
         Move();
         Jump();
         CheckIfGrounded();
         OnTriggerEnter2D(other);
+        if (!audioSource.isPlaying && (audioSource.time == 0f) && audioPlayed == true)
+                {
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 0);
+                }
     }
 
     void Move()
@@ -38,7 +50,23 @@ public class movement : MonoBehaviour
         float x = Input.GetAxisRaw("Horizontal");
         float moveBy = x * speed;
         rb.velocity = new Vector2(moveBy, rb.velocity.y);
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
+        {
+            animator.SetBool("IsRunning", true);
+        }
+        else
+        {
+            animator.SetBool("IsRunning", false);
+        }
         
+        if(Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow))
+        {
+            spriteRenderer.flipX = true;
+        }
+        else if(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.RightArrow))
+        {
+            spriteRenderer.flipX = false;
+        }
     }
 
     void Jump()
@@ -46,7 +74,6 @@ public class movement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            //.AddForce(Vector2.up * jumpForce * 1.5f, ForceMode2D.Impulse);
         }
 
         if (Input.GetKeyUp(KeyCode.Space))
@@ -61,27 +88,21 @@ public class movement : MonoBehaviour
         if (collider != null)
         {
             isGrounded = true;
+            animator.SetBool("isInTheAir", false);
         }
         else
         {
             isGrounded = false;
-
+            animator.SetBool("isInTheAir", true);
         }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        //Debug.Log(other.gameObject.name);
         if (other.gameObject.tag == "Finish")
         {
-            Debug.Log("hi");
             win = 1;
             isflagged = 1;
-        
-           
-            //gameObject.SetActive(false);
-            
-            //GameObject.Find("winningword").GetComponent<appear>().gameObject.SetActive(true);
         }
 
         if (isflagged == 1)
@@ -93,11 +114,12 @@ public class movement : MonoBehaviour
                 }
             }
         
-        if (other.gameObject.tag == "obstacle" && isflagged == 0)
+        if (other.gameObject.tag == "obstacle" && isflagged == 0 && audioPlayed == false)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 0);
-
-            // do the kill player stuff here
+            spriteRenderer.enabled = false;
+            audioSource.Play();
+            audioPlayed = true;
+            Time.timeScale = 0;
         }
     }
 
